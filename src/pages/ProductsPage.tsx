@@ -34,7 +34,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 const ProductsPage: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { products, isLoading, total, limit } = useAppSelector((state) => state.product);
+    const { products, isLoading, total } = useAppSelector((state) => state.product);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchQuery, setSearchQuery] = useState('');
