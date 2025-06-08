@@ -98,7 +98,7 @@ export const deleteProduct = createAsyncThunk(
   async (id: number, { rejectWithValue }) => {
     try {
       const response = await productService.deleteProduct(id);
-      return { ...response, id };
+      return response; // DummyJSON returns the deleted product with isDeleted flag
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to delete product'
@@ -160,6 +160,8 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.products = action.payload.products;
         state.total = action.payload.total;
+        state.skip = action.payload.skip || 0;
+        state.limit = action.payload.limit || action.payload.products.length;
       })
       .addCase(searchProducts.rejected, (state, action) => {
         state.isLoading = false;
@@ -205,10 +207,13 @@ const productSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<{id: number, isDeleted: boolean}>) => {
+      .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<Product>) => {
         state.isLoading = false;
-        if (action.payload.isDeleted) {
+        // DummyJSON returns the deleted product with isDeleted flag
+        if (action.payload && action.payload.id) {
+          // Filter out the deleted product from the products array
           state.products = state.products.filter(p => p.id !== action.payload.id);
+          // Clear the current product if it's the one that was deleted
           if (state.product?.id === action.payload.id) {
             state.product = null;
           }

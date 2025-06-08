@@ -30,11 +30,14 @@ const validationSchema = yup.object({
 });
 
 const categories = [
-    'smartphones', 'laptops', 'fragrances', 'skincare',
-    'groceries', 'home-decoration', 'furniture', 'tops',
-    'womens-dresses', 'womens-shoes', 'mens-shirts', 'mens-shoes',
-    'mens-watches', 'womens-watches', 'womens-bags', 'womens-jewellery',
-    'sunglasses', 'automotive', 'motorcycle', 'lighting'
+    'beauty', 'fragrances', 'furniture', 'groceries',
+    'home-decoration', 'kitchen-accessories', 'laptops',
+    'mens-shirts', 'mens-shoes', 'mens-watches',
+    'mobile-accessories', 'motorcycle', 'skin-care',
+    'smartphones', 'sports-accessories', 'sunglasses',
+    'tablets', 'tops', 'vehicle', 'womens-bags',
+    'womens-dresses', 'womens-jewellery', 'womens-shoes',
+    'womens-watches'
 ];
 
 const ProductForm: React.FC = () => {
@@ -70,23 +73,29 @@ const ProductForm: React.FC = () => {
         enableReinitialize: true,
         validationSchema: validationSchema,
         onSubmit: async (values) => {
+            // Format the data to match DummyJSON API expectations
             const productData: CreateProductInput = {
                 ...values,
                 price: Number(values.price),
                 stock: Number(values.stock),
                 discountPercentage: Number(values.discountPercentage),
+                // Ensure we have an array of images (even if empty)
+                images: product?.images || []
             };
 
             try {
                 if (isEditMode && id) {
                     await dispatch(updateProduct({ id: Number(id), update: productData })).unwrap();
+                    console.log('Product updated successfully');
                     navigate(`/products/${id}`);
                 } else {
                     const result = await dispatch(addProduct(productData)).unwrap();
+                    console.log('Product added successfully:', result);
                     navigate(`/products/${result.id}`);
                 }
             } catch (err) {
                 console.error('Failed to save product:', err);
+                // You could add a notification system here
             }
         },
     });

@@ -63,14 +63,20 @@ const ProductsPage: React.FC = () => {
         setDeleteDialogOpen(true);
     };
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (productToDelete) {
-            dispatch(deleteProduct(productToDelete)).then(() => {
+            try {
+                await dispatch(deleteProduct(productToDelete)).unwrap();
                 // Refresh products after deletion
                 dispatch(fetchProducts({ limit: rowsPerPage, skip: page * rowsPerPage }));
-            });
-            setDeleteDialogOpen(false);
-            setProductToDelete(null);
+                // Show success notification if needed
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                // Handle error if needed
+            } finally {
+                setDeleteDialogOpen(false);
+                setProductToDelete(null);
+            }
         }
     };
 
